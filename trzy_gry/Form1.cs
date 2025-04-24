@@ -9,7 +9,8 @@ namespace trzy_gry
 
         private void button3_Click(object sender, EventArgs e)
         {
-            //:)
+            Form2 xdd = new Form2(this);
+            xdd.Show();
         }
     }
 }
