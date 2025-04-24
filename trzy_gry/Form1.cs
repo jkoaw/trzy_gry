@@ -6,5 +6,10 @@ namespace trzy_gry
         {
             InitializeComponent();
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            //:)
+        }
     }
 }
