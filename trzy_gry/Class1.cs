@@ -1,6 +1,7 @@
 ﻿//using sun.awt;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -8,18 +9,39 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 //using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace trzy_gry
 {
     class Card: PictureBox
     {
+       
         public char znaczek;
+        //private int liczba;
         public int liczba;
+        public int Liczba
+        {
+            get
+            {
+                return liczba;
+            }
+
+            set
+            {
+
+                liczba = value;
+                form.OnArenaChanged();
+
+            }
+        }
+    
+
         public int wartosckarty;
         string[] lista = new string[17];
         int cardheight = 260;
         int cardwidth = 160;
+        bool played;
         Graphics grafika;
 
         public Card()
@@ -37,8 +59,23 @@ namespace trzy_gry
             this.DragEnter += pictureBox2_DragEnter;
             this.DragDrop += pictureBox2_DragDrop;
         }
+        Form2 form;
+        public Card(Form2 form)
+        {
+            this.form = form;
+            this.Size = new Size(cardwidth, cardheight - 60);
+            generateCard2();
+            grafika = Graphics.FromImage(this.Image);
+            ControlPaint.DrawBorder(grafika, this.ClientRectangle, Color.Black, ButtonBorderStyle.Solid);
+            this.Tag = Color.Red;
+            this.Click += image_Click;
+            this.AllowDrop = true;
 
+            this.MouseDown += pictureBox1_MouseDown;
 
+            this.DragEnter += pictureBox2_DragEnter;
+            this.DragDrop += pictureBox2_DragDrop;
+        }
 
 
         public Card(int licz,char zna)
@@ -60,24 +97,7 @@ namespace trzy_gry
 
         public bool drageed = false;
 
-        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
-        {
-            var img = this.Image;
-            if (img == null) return;
-            drageed = true;
-            if (DoDragDrop(img, DragDropEffects.Move) == DragDropEffects.Move)
-            {
-                if(drageed == true)
-                {
-                    generateCard2();
-                }
-                //this.Image = null;
-                drageed = false;
-
-
-            }
-        }
-
+ 
         public struct IconInfo
         {
             public bool fIcon;
@@ -102,10 +122,28 @@ namespace trzy_gry
             tmp.fIcon = false;
             return new Cursor(CreateIconIndirect(ref tmp));
         }
-        
+        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
+        {
+            var img = this.Image;
+            if (img == null) return;
+            drageed = true;
+            if (DoDragDrop(img, DragDropEffects.Move) == DragDropEffects.Move)
+            {
+                if (drageed == true)
+                {
+                    generateCard2();
+                    
+                }
+                //this.Image = null;
+                drageed = false;
+
+
+            }
+        }
+
         void pictureBox2_DragEnter(object sender, DragEventArgs e)
         {
-            Bitmap bitmap  = new Bitmap(this.Image);
+            Bitmap bitmap  = new Bitmap(this.Image, new Size(cardwidth/5, cardheight/5));
             if (e.Data.GetDataPresent(DataFormats.Bitmap))
             {
                 e.Effect = DragDropEffects.Move;
@@ -125,10 +163,14 @@ namespace trzy_gry
         void pictureBox2_DragDrop(object sender, DragEventArgs e)
         {
             Card sender2 = (Card)sender;
-            if (this != sender2) sender2.drageed = true;
-            else sender2.drageed = false;
+            if (this != sender2) { sender2.drageed = true; return; }
+            else { sender2.drageed = false; }
             var bmp = (Bitmap)e.Data.GetData(DataFormats.Bitmap);
             this.Image = bmp;
+            this.liczba = sender2.liczba;
+            this.znaczek = sender2.znaczek;
+            sender2.liczba = 0;
+            sender2.znaczek = '0';
         }
 
 
@@ -148,21 +190,21 @@ namespace trzy_gry
         {
             List<Image> images = new List<Image>();
             string temp = Directory.GetParent(System.IO.Directory.GetCurrentDirectory()).Parent.Parent.FullName;
-            images.Add(Image.FromFile(temp + "/"+liczba.ToString() + ".png"));
-            images.Add(Image.FromFile(temp + "/" + znaczek.ToString() + ".png"));
+            images.Add(Image.FromFile(temp + "/res/" + liczba.ToString() + ".png"));
+            images.Add(Image.FromFile(temp + "/res/" + znaczek.ToString() + ".png"));
 
            
             
 
             
-            images.Add(Image.FromFile(temp + "/" + znaczek.ToString() + ".png"));
-            images.Add(Image.FromFile(temp + "/" + liczba.ToString() + ".png"));
+            images.Add(Image.FromFile(temp + "/res/" + znaczek.ToString() + ".png"));
+            images.Add(Image.FromFile(temp + "/res/" + liczba.ToString() + ".png"));
 
             return images;
         }
         const int borderSize = 2;
 
-        void generateCard2()
+        public void generateCard2()
         {
             liczba = 2;
             znaczek = 'k';
@@ -187,7 +229,7 @@ namespace trzy_gry
             ControlPaint.DrawBorder(d, this.ClientRectangle, Color.Black, ButtonBorderStyle.Solid);
         }
 
-        void generateCard()
+        public void generateCard()
         {
 
             List<Image> images = loadImg();
@@ -244,6 +286,22 @@ namespace trzy_gry
 
         }
 
+
+        public void generateCardReverse()
+        {
+            Image tem = Image.FromFile(Directory.GetParent(System.IO.Directory.GetCurrentDirectory()).Parent.Parent.FullName + "/res/" + "logo.png");
+
+            Bitmap combinedBitmap = new Bitmap(435, 750);
+            using (Graphics g = Graphics.FromImage(combinedBitmap))
+            {
+                g.Clear(Color.White);
+                g.DrawImage(tem,0,150);
+            }
+            this.Image = new Bitmap(combinedBitmap, new Size(cardwidth, cardheight));
+            this.Size = new Size(cardwidth, cardheight - 60);
+            Graphics d = Graphics.FromImage(this.Image);
+            ControlPaint.DrawBorder(d, this.ClientRectangle, Color.Black, ButtonBorderStyle.Solid);
+        }
 
         public void pictureBox1_MouseEnter(object sender, PaintEventArgs e)
         {

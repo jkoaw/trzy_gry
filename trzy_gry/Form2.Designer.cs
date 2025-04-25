@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             label1 = new Label();
+            start = new Button();
             SuspendLayout();
             // 
             // label1
@@ -41,11 +42,23 @@
             label1.Text = "label1";
             label1.Click += label1_Click;
             // 
+            // start
+            // 
+            start.Font = new Font("Top Secret", 26.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            start.Location = new Point(289, 169);
+            start.Name = "start";
+            start.Size = new Size(185, 95);
+            start.TabIndex = 1;
+            start.Text = "Start";
+            start.UseVisualStyleBackColor = true;
+            start.Click += start_Click;
+            // 
             // Form2
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(start);
             Controls.Add(label1);
             Name = "Form2";
             Text = "Form2";
@@ -57,5 +70,6 @@
         #endregion
 
         private Label label1;
+        private Button start;
     }
 }
