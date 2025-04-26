@@ -14,9 +14,10 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace trzy_gry
 {
+    
     class Card: PictureBox
     {
-       
+        public int cardID;
         public char znaczek;
         //private int liczba;
         public int liczba;
@@ -31,11 +32,11 @@ namespace trzy_gry
             {
 
                 liczba = value;
-                form.OnArenaChanged();
+                form.OnArenaChanged(playerID);
 
             }
         }
-    
+        public int playerID;
 
         public int wartosckarty;
         string[] lista = new string[17];
@@ -51,13 +52,13 @@ namespace trzy_gry
             grafika = Graphics.FromImage(this.Image);
             ControlPaint.DrawBorder(grafika, this.ClientRectangle, Color.Black, ButtonBorderStyle.Solid);
             this.Tag = Color.Red;
-            this.Click += image_Click;
-            this.AllowDrop = true;
+            //this.Click += image_Click;
+           // this.AllowDrop = true;
            
-            this.MouseDown += pictureBox1_MouseDown;
+          //  this.MouseDown += pictureBox1_MouseDown;
 
-            this.DragEnter += pictureBox2_DragEnter;
-            this.DragDrop += pictureBox2_DragDrop;
+            //this.DragEnter += pictureBox2_DragEnter;
+            //this.DragDrop += pictureBox2_DragDrop;
         }
         Form2 form;
         public Card(Form2 form)
@@ -68,15 +69,18 @@ namespace trzy_gry
             grafika = Graphics.FromImage(this.Image);
             ControlPaint.DrawBorder(grafika, this.ClientRectangle, Color.Black, ButtonBorderStyle.Solid);
             this.Tag = Color.Red;
-            this.Click += image_Click;
-            this.AllowDrop = true;
+            //this.Click += image_Click;
+           // this.AllowDrop = true;
 
-            this.MouseDown += pictureBox1_MouseDown;
+           // this.MouseDown += pictureBox1_MouseDown;
 
-            this.DragEnter += pictureBox2_DragEnter;
-            this.DragDrop += pictureBox2_DragDrop;
+            //this.DragEnter += pictureBox2_DragEnter;
+            //this.DragDrop += pictureBox2_DragDrop;
         }
-
+        public void assignID(int id)
+        {
+            playerID = id;
+        }
 
         public Card(int licz,char zna)
         {
@@ -85,100 +89,17 @@ namespace trzy_gry
             liczba = licz;
             this.Tag = Color.Red;
             generateCard();
-            this.Click += image_Click;
-            this.AllowDrop = true;
+            //this.Click += image_Click;
+            //this.AllowDrop = true;
             grafika = Graphics.FromImage(this.Image);
-            this.MouseDown += pictureBox1_MouseDown;
+            //this.MouseDown += pictureBox1_MouseDown;
 
-            this.DragEnter += pictureBox2_DragEnter;
-            this.DragDrop += pictureBox2_DragDrop;
+            //this.DragEnter += pictureBox2_DragEnter;
+            //this.DragDrop += pictureBox2_DragDrop;
 
         }
 
-        public bool drageed = false;
-
- 
-        public struct IconInfo
-        {
-            public bool fIcon;
-            public int xHotspot;
-            public int yHotspot;
-            public IntPtr hbmMask;
-            public IntPtr hbmColor;
-        }
-        [DllImport("user32.dll")]
-        public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetIconInfo(IntPtr hIcon, ref IconInfo pIconInfo);
-        public static Cursor CreateCursor(Bitmap bmp,
-        int xHotSpot, int yHotSpot)
-        {
-            IconInfo tmp = new IconInfo();
-            GetIconInfo(bmp.GetHicon(), ref tmp);
-            tmp.xHotspot = xHotSpot;
-            tmp.yHotspot = yHotSpot;
-            tmp.fIcon = false;
-            return new Cursor(CreateIconIndirect(ref tmp));
-        }
-        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
-        {
-            var img = this.Image;
-            if (img == null) return;
-            drageed = true;
-            if (DoDragDrop(img, DragDropEffects.Move) == DragDropEffects.Move)
-            {
-                if (drageed == true)
-                {
-                    generateCard2();
-                    
-                }
-                //this.Image = null;
-                drageed = false;
-
-
-            }
-        }
-
-        void pictureBox2_DragEnter(object sender, DragEventArgs e)
-        {
-            Bitmap bitmap  = new Bitmap(this.Image, new Size(cardwidth/5, cardheight/5));
-            if (e.Data.GetDataPresent(DataFormats.Bitmap))
-            {
-                e.Effect = DragDropEffects.Move;
-                using (Graphics g = Graphics.FromImage(bitmap))
-                { 
-                 g.DrawImage(this.Image, 0, 0); 
-                }
-
-
-                    Cursor.Current = CreateCursor(bitmap, 0, 0);
-            }
-                
-
-          
-        }
-
-        void pictureBox2_DragDrop(object sender, DragEventArgs e)
-        {
-            Card sender2 = (Card)sender;
-            if (this != sender2) { sender2.drageed = true; return; }
-            else { sender2.drageed = false; }
-            var bmp = (Bitmap)e.Data.GetData(DataFormats.Bitmap);
-            this.Image = bmp;
-            this.liczba = sender2.liczba;
-            this.znaczek = sender2.znaczek;
-            sender2.liczba = 0;
-            sender2.znaczek = '0';
-        }
-
-
-
-
-
-
-
+      
 
 
         public void locationen(int x, int y)
@@ -312,7 +233,8 @@ namespace trzy_gry
 
         public void image_Click(object sender, EventArgs e)
         {
-            
+            System.Diagnostics.Debug.WriteLine("sender player id = " + this.liczba+" tah =  "+ this.Tag);
+            ControlPaint.DrawBorder(grafika, this.ClientRectangle, Color.Red, ButtonBorderStyle.Solid);
             if ((Color)this.Tag == Color.Red) { 
                 this.Tag = Color.Blue;
                 
@@ -337,8 +259,101 @@ namespace trzy_gry
             //this.SizeMode = PictureBoxSizeMode.Zoom;
             this.Cursor = Cursors.Default;
         }
+
+
+        //---------------------------------------------------------------------nie dodtykac -----------------------------------------------------------------------------------//
+
+
+        public bool drageed = false;
+
+
+        public struct IconInfo
+        {
+            public bool fIcon;
+            public int xHotspot;
+            public int yHotspot;
+            public IntPtr hbmMask;
+            public IntPtr hbmColor;
+        }
+        [DllImport("user32.dll")]
+        public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetIconInfo(IntPtr hIcon, ref IconInfo pIconInfo);
+        public static Cursor CreateCursor(Bitmap bmp,
+        int xHotSpot, int yHotSpot)
+        {
+            IconInfo tmp = new IconInfo();
+            GetIconInfo(bmp.GetHicon(), ref tmp);
+            tmp.xHotspot = xHotSpot;
+            tmp.yHotspot = yHotSpot;
+            tmp.fIcon = false;
+            return new Cursor(CreateIconIndirect(ref tmp));
+        }
+        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
+        {
+            var img = this.Image;
+            if (img == null) return;
+            drageed = true;
+            if (DoDragDrop(img, DragDropEffects.Move) == DragDropEffects.Move)
+            {
+                if (drageed == true)
+                {
+                    generateCard2();
+
+                }
+                //this.Image = null;
+                drageed = false;
+
+
+            }
+        }
+
+        void pictureBox2_DragEnter(object sender, DragEventArgs e)
+        {
+            Bitmap bitmap = new Bitmap(this.Image, new Size(cardwidth / 5, cardheight / 5));
+            if (e.Data.GetDataPresent(DataFormats.Bitmap))
+            {
+                e.Effect = DragDropEffects.Move;
+                using (Graphics g = Graphics.FromImage(bitmap))
+                {
+                    g.DrawImage(this.Image, 0, 0);
+                }
+
+
+                Cursor.Current = CreateCursor(bitmap, 0, 0);
+            }
+
+
+
+        }
+
+        void pictureBox2_DragDrop(object sender, DragEventArgs e)
+        {
+            Card sender2 = (Card)sender;
+            if (this != sender2) { sender2.drageed = true; return; }
+            else { sender2.drageed = false; }
+            System.Diagnostics.Debug.WriteLine("sender player id = " + sender2.liczba.ToString() + "reciver player id = " + this.liczba.ToString());
+
+            var bmp = (Bitmap)e.Data.GetData(DataFormats.Bitmap);
+            this.Image = bmp;
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 
 
-  
 }
