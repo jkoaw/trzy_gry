@@ -40,10 +40,17 @@ namespace trzy_gry
 
         public int wartosckarty;
         string[] lista = new string[17];
-        int cardheight = 260;
-        int cardwidth = 160;
+        public int cardheight = 260; // razie co to se zmien przy tworzeniu talii
+        public int cardwidth = 160;
         bool played;
         Graphics grafika;
+
+        
+        void changesize(int width, int height)
+        {
+            cardwidth = width;
+            cardheight = height;
+        }
 
         public Card()
         {
@@ -127,8 +134,7 @@ namespace trzy_gry
 
         public void generateCard2()
         {
-            liczba = 2;
-            znaczek = 'k';
+ 
             List<Image> images = loadImg();
 
             Bitmap combinedBitmap = new Bitmap(images[0].Width * 4 - 50, 750);
