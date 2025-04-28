@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlTypes;
 using System.Drawing;
 using System.Linq;
 using System.Security.Policy;
@@ -37,7 +38,7 @@ namespace trzy_gry
 
         }
 
-        struct player
+        class player
         {
             public int id;
             public string name;
@@ -46,9 +47,9 @@ namespace trzy_gry
             public List<Card> hand;
             public int playerHeight;
             public int playerWidth;
-            public int money ;
+            public int money;
             public Label nameplate;
-            public bool folded ;
+            public bool folded;
             public bool raised;
 
             public void set(int id, string name, int height, int width, Label template)
@@ -65,6 +66,10 @@ namespace trzy_gry
                 folded = false;
                 raised = false;
             }
+
+            public void setMoney(int moneychange){
+                money = moneychange;
+                }
         }
         void Shuffle<T>(List<T> list)
         {
@@ -129,10 +134,10 @@ namespace trzy_gry
             for (int i = 0; i < 5; i++)
             {
                 arena[i][0].locationen(arenaLocWidth + 10 * i + arena[0][0].Width * i, arenaLocHeight);
-                System.Diagnostics.Debug.WriteLine("arena [" + i + "] arena place = " + arena[i][0].liczba);
+                //System.Diagnostics.Debug.WriteLine("arena [" + i + "] arena place = " + arena[i][0].liczba);
                 arena[i][0].generateCard2();
                 arena[i][0].Visible = true;
-                System.Diagnostics.Debug.WriteLine("arena [" + i + "] arena place = " + arena[i][0].liczba);
+               // System.Diagnostics.Debug.WriteLine("arena [" + i + "] arena place = " + arena[i][0].liczba);
                 //this.Controls.Add(arena[i][0]);
             }
 
@@ -301,8 +306,11 @@ namespace trzy_gry
         {
             for (int i = start; i < stop; i++)
             {
-
-                switch (rng.Next() % 3)
+                if (players[i].folded)
+                {
+                    continue;
+                }
+                switch (rng.Next() % 6)
                 {
                     case 0:
                         
@@ -311,13 +319,23 @@ namespace trzy_gry
                     case 1:
                         //if (players[i].raised)
                         // callfun(players[i]);
+                        if(currentRaise > 0) callfun(players[i]);
                         checkfun(players[i]);
                         break;
                     case 2:
-                        foldfun(players[i]);
-                        //risefun(players[i]);
+                        if (currentRaise > 0) callfun(players[i]);
+                        risefun(players[i]);
                         break;
                     case 3:
+                        if (currentRaise > 0) callfun(players[i]);
+                        checkfun(players[i]);
+                        break;
+                    case 4:
+                        if (currentRaise > 0) callfun(players[i]);
+                        checkfun(players[i]);
+                        break;
+                    case 5:
+                        if (currentRaise > 0) callfun(players[i]);
                         checkfun(players[i]);
                         break;
                     default:
@@ -341,7 +359,7 @@ namespace trzy_gry
             if (turn == 0)
             {
                 risefun(players[0]);
-                randomChoiceOfPlayers(1,3);
+               // randomChoiceOfPlayers(1,3);
             }
             else
             {
@@ -356,9 +374,9 @@ namespace trzy_gry
         {
             for (int i = 0; i < players.Count-1; i++)
             {
-                if (players[i].id != current.id)
+                if (players[i].id != current.id && !players[i].folded)
                 {
-                    switch (rng.Next() % 2)
+                    switch (rng.Next() % 10)
                     {
                         case 0:
 
@@ -371,6 +389,7 @@ namespace trzy_gry
                             break;
                        
                         default:
+                            callfun(players[i]);
                             break;
                     }
                 }
@@ -379,6 +398,8 @@ namespace trzy_gry
             messege.Text = " do you fold rise or call";
         }
 
+
+        
         void foldfun(player current)
         {
             current.nameplate.Text = "player"+ current.id+ " money: "+ current.money + " Folded";
@@ -390,15 +411,24 @@ namespace trzy_gry
             if (currentRaise == 0) return;
             potValue += currentRaise;
             pot.Text = "pot: " + potValue;
-            current.money = current.money - currentRaise;
+            players[current.id].setMoney(current.money - currentRaise);
             current.nameplate.Text = "player" + current.id + " money: " + current.money + " Called";
+
+           
+            
         }
         void risefun(player current)
         {
             currentRaise += rng.Next() % 100;
             potValue += currentRaise;
             pot.Text = "pot: " + potValue;
-            current.money = current.money - currentRaise;
+
+            players[current.id].setMoney(current.money - currentRaise);
+            for (int i = 0; i < players.Count; i++)
+            {
+                System.Diagnostics.Debug.WriteLine("player [" + i + "] money = " + players[i].money);
+            }
+
             current.nameplate.Text = "player" + current.id + " money: " + current.money + " Rised for "+ currentRaise;
 
             dotest( current);
@@ -444,6 +474,11 @@ namespace trzy_gry
         }
         private void board_Click(object sender, EventArgs e)
         {
+            for (int i = 0; i < players.Count; i++)
+            {
+                System.Diagnostics.Debug.WriteLine("player [" + i + "] money = " + players[i].money);
+            }
+
             if (!playercanclick)
             {
                 
