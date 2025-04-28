@@ -352,9 +352,9 @@ namespace trzy_gry
         int playersFolded = 0;
         void nextturn()
         {
-                
-            if (turn == 3) decideWinner();
-            if(playersFolded > 3 ) decideWinner();
+
+            if (turn == 3) { System.Diagnostics.Debug.WriteLine("turn 3  decide Winner" ); decideWinner(); }
+            if(playersFolded > 3 ) { System.Diagnostics.Debug.WriteLine("folded > 3  decide Winner"); decideWinner(); }
 
             if (turn == 0)
             {
@@ -402,6 +402,9 @@ namespace trzy_gry
         
         void foldfun(player current)
         {
+            int folded = 0;
+            for (int i = 0; i < players.Count; i++) if (players[i].folded) folded++;
+            if (folded > 3) { System.Diagnostics.Debug.WriteLine("folded fun  decide Winner"); decideWinner(); }
             current.nameplate.Text = "player"+ current.id+ " money: "+ current.money + " Folded";
             current.folded = true;
             playersFolded++;
@@ -412,11 +415,13 @@ namespace trzy_gry
             potValue += currentRaise;
             pot.Text = "pot: " + potValue;
             players[current.id].setMoney(current.money - currentRaise);
+            System.Diagnostics.Debug.WriteLine("player [" + current.id + "] called money = " + current.money);
             current.nameplate.Text = "player" + current.id + " money: " + current.money + " Called";
 
            
             
         }
+        //raise bota w ost funkcji cos sie dzieje
         void risefun(player current)
         {
             currentRaise += rng.Next() % 100;
@@ -424,11 +429,8 @@ namespace trzy_gry
             pot.Text = "pot: " + potValue;
 
             players[current.id].setMoney(current.money - currentRaise);
-            for (int i = 0; i < players.Count; i++)
-            {
-                System.Diagnostics.Debug.WriteLine("player [" + i + "] money = " + players[i].money);
-            }
 
+            System.Diagnostics.Debug.WriteLine("player [" + current.id + "] rised money = " + current.money);
             current.nameplate.Text = "player" + current.id + " money: " + current.money + " Rised for "+ currentRaise;
 
             dotest( current);
@@ -476,9 +478,9 @@ namespace trzy_gry
         {
             for (int i = 0; i < players.Count; i++)
             {
-                System.Diagnostics.Debug.WriteLine("player [" + i + "] money = " + players[i].money);
+             //   System.Diagnostics.Debug.WriteLine("player [" + i + "] money = " + players[i].money);
             }
-
+            System.Diagnostics.Debug.WriteLine("-------------------------" );
             if (!playercanclick)
             {
                 
