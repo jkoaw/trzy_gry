@@ -569,16 +569,17 @@ namespace trzy_gry
             haveplayerscard = false;
             // One Pair------------------------------------------------------------
             current.handrank = HandRank.HighCard;
-            foreach (Card item in temp)
+            if (current.hand[0].liczba > current.hand[1].liczba)
             {
-                if (item.playerID == current.id)
-                {
-                    current.handranknumber = temp[0].liczba;
-                    break;
-                }
-
+                current.handranknumber = current.hand[0].liczba;
             }
-            return; // z ręki ???
+            else
+            {
+                current.handranknumber = current.hand[1].liczba;
+            }
+
+
+                return; // z ręki ???
 
             // 3 te same i 2 nie wykrywa 3+2 pot trza naprawic dodawanie do raczej xdD nie wykrywa par 
         }
