@@ -827,6 +827,7 @@ namespace trzy_gry
         private void board_wait_Click(object sender, EventArgs e)
         {
             if (!waitTillNextTurn) return;
+            messege.Text = "click somwhere ";
             factualnextturnclick = true;
         }
 

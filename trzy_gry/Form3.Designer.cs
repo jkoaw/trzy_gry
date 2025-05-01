@@ -39,6 +39,7 @@
             player3 = new Label();
             pot = new Label();
             messege = new Label();
+            label1 = new Label();
             SuspendLayout();
             // 
             // start
@@ -147,11 +148,21 @@
             messege.TabIndex = 10;
             messege.Text = "messege";
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(1148, 9);
+            label1.Name = "label1";
+            label1.Size = new Size(336, 15);
+            label1.TabIndex = 11;
+            label1.Text = "to do next action after clicking button click somwere on board";
+            // 
             // Form3
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1496, 690);
+            Controls.Add(label1);
             Controls.Add(messege);
             Controls.Add(pot);
             Controls.Add(player3);
@@ -183,5 +194,6 @@
         private Label player3;
         private Label pot;
         private Label messege;
+        private Label label1;
     }
 }
