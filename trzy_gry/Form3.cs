@@ -37,7 +37,7 @@ namespace trzy_gry
             this.Click += board_Click;
             this.Click += board_new_rozdanie_Click;
             this.Click += board_wait_Click;
-            System.Diagnostics.Debug.WriteLine(" deck = " + deck.Count);
+            //System.Diagnostics.Debug.WriteLine(" deck = " + deck.Count);
 
         }
 
@@ -190,7 +190,7 @@ namespace trzy_gry
                 deck[i + 10].assignID((i - 5) % 4);
                 players[(i - 5) % 4].hand.Add(deck[i+10]);
             }
-            System.Diagnostics.Debug.WriteLine(" deck = " + deck.Count);
+            //System.Diagnostics.Debug.WriteLine(" deck = " + deck.Count);
             for (int i = 0; i < 4; i++)
             {
                 spawnhand(players[i]);
@@ -258,21 +258,7 @@ namespace trzy_gry
             }
 
         }
-         
-        bool checkIfRaiseOrFold()
-        {
 
-            for (int i = 0; i < players.Count; i++)
-            {
-                if (players[i].folded) continue;
-
-                if (players[i].raised)
-                {
-
-                }
-            }
-            return true;
-        }
         bool playercanclick = true;
 
         void revalArena()
@@ -302,6 +288,10 @@ namespace trzy_gry
         int potValue = 0;
         void newGameHandler() //starting new bet
         {
+            for (int i = 0; i < players.Count; i++)
+            {
+                players[i].folded = false;
+            }
             currentRaise = 0;
             turn = 0;
             potValue = 0;
@@ -335,7 +325,8 @@ namespace trzy_gry
                         break;
                     case 2:
                         if (currentRaise > 0) callfun(players[i]);
-                        risefun(players[i]);
+                        if(turn != 3 )risefun(players[i]);
+                        else checkfun(players[i]);
                         break;
                     case 3:
                         if (currentRaise > 0) callfun(players[i]);
@@ -375,7 +366,7 @@ namespace trzy_gry
                 for (int j = 0; j < temp.Count; j++)
                 {
 
-                    if (temp[i].liczba < temp[j].liczba)
+                    if (temp[i].liczba > temp[j].liczba)
                     {
                         Card var2 = temp[i];
                         temp[i] = temp[j];
@@ -383,29 +374,30 @@ namespace trzy_gry
                     }
                 }
             }
-            for (int i = 0; i < temp.Count; i++)
-            {
-                System.Diagnostics.Debug.WriteLine("winner " + temp[i].liczba);
-            }
+            System.Diagnostics.Debug.WriteLine(" player[" + current.id + "] ------------------------------------------------------------");
+         
+            System.Diagnostics.Debug.WriteLine("player["+current.id+"] hand + arena " + temp[0].liczba +" "+ temp[1].liczba + " " + temp[2].liczba + " " + temp[3].liczba + " " + temp[4].liczba + " " + temp[5].liczba + " " + temp[6].liczba);
+            
 
-
+            
             //Royal Flush------------------------------------------------------------
             int licznik = 0;
             for (int i = 0; i < temp.Count-1; i++)
             {
-                if (14 == temp[i].liczba)
+                if (14 == temp[0].liczba)
                 {
                     if (temp[i].liczba == temp[i + 1].liczba + 1 && temp[i].znaczek == temp[i + 1].znaczek)
                     {
                         licznik++;
 
-
+                        if (licznik == 4) break;
                     }
                 }
                 else break;
              
             }
-            if(licznik >= 5) { current.handrank = HandRank.RoyalFlush; return; }
+            System.Diagnostics.Debug.WriteLine("Royal Flush  licznik =  " + licznik);
+            if (licznik >= 4) { current.handrank = HandRank.RoyalFlush; return; }
             licznik = 0;
             //Straight Flush------------------------------------------------------------
             for (int i = 0; i < temp.Count - 1; i++)
@@ -414,20 +406,24 @@ namespace trzy_gry
                 {
                     licznik++;
                 }
-                else break;
+            
 
             }
-            if (licznik >= 5) { current.handrank = HandRank.StraightFlush; current.handranknumber = temp[0].liczba; return; }
+            System.Diagnostics.Debug.WriteLine("Straight Flush  licznik =  " + licznik);
+            if (licznik >= 4) { current.handrank = HandRank.StraightFlush; current.handranknumber = temp[0].liczba; return; }
             //Four of a Kind------------------------------------------------------------
             for (int i = 0; i < temp.Count - 1; i++)
             {
-                if (temp[i].liczba == temp[i + 1].liczba )
+                if (temp[i].liczba == temp[i + 1].liczba)
                 {
                     licznik++;
+                    if (licznik == 3) break;
                 }
+                else licznik = 0;
                 
             }
-            if (licznik == 4) { current.handrank = HandRank.FourOfAKind; current.handranknumber = temp[0].liczba; return; }
+            System.Diagnostics.Debug.WriteLine("Four of a Kind  licznik =  " + licznik);
+            if (licznik == 3) { current.handrank = HandRank.FourOfAKind; current.handranknumber = temp[0].liczba; return; }
             licznik = 0;
             int licznik2 = 0;
             int wynik = 0;
@@ -448,8 +444,8 @@ namespace trzy_gry
                 }
                
             }
-            
-            if ((licznik == 3 || licznik >= 1) && (licznik2 == 3 || licznik2 >= 1)) { current.handrank = HandRank.FullHouse; current.handranknumber = wynik; return; } //mabe player extension maybe 1 lub  2 ten wynik uhh
+            System.Diagnostics.Debug.WriteLine("Full House licznik =  " + licznik+ " licznik 2 = "+ licznik2);
+            if ((licznik == 2 || licznik >= 1) && (licznik2 == 3 || licznik2 >= 1)) { current.handrank = HandRank.FullHouse; current.handranknumber = wynik; return; } //mabe player extension maybe 1 lub  2 ten wynik uhh
             licznik = 0;
             var = 0;
             licznik2 = 0;
@@ -464,8 +460,8 @@ namespace trzy_gry
                 }
                
             }
-            
-            if ((licznik >= 5 ) ) { current.handrank = HandRank.Flush; current.handranknumber = wynik; return; } 
+            System.Diagnostics.Debug.WriteLine("Flush licznik =  " + licznik);
+            if ((licznik >= 4 ) ) { current.handrank = HandRank.Flush; current.handranknumber = wynik; return; } 
             licznik = 0;
             licznik2 = 0;
             wynik = 0;
@@ -476,26 +472,34 @@ namespace trzy_gry
                 {
                     licznik++;
                     wynik += temp[i].liczba;
+                    if (licznik == 4) break;
+                }
+                else
+                {
+                    licznik = 0;
+                    wynik = 0;
                 }
 
             }
-            
-            if ((licznik >= 5)) { current.handrank = HandRank.Straight; current.handranknumber = wynik; return; } 
+            System.Diagnostics.Debug.WriteLine("Straight licznik =  " + licznik);
+            if ((licznik >= 4)) { current.handrank = HandRank.Straight; current.handranknumber = wynik; return; } 
             licznik = 0;
             licznik2 = 0;
             wynik = 0;
             // Three of a Kind------------------------------------------------------------ bugg zał liczba dwie 6 jako i w dodatku krówl xd
             for (int i = 0; i < temp.Count - 1; i++)
             {
-                if (temp[i].liczba == temp[i + 1].liczba ) 
+                if (temp[i].liczba == temp[i + 1].liczba)
                 {
                     licznik++;
                     wynik = temp[i].liczba;
+                    if (licznik == 2) break;
                 }
+                else { licznik = 0; wynik = 0; } 
 
             }
-
-            if ((licznik >= 3)) { current.handrank = HandRank.ThreeOfAKind; current.handranknumber = wynik; return; } 
+            System.Diagnostics.Debug.WriteLine("Three of a Kind licznik =  " + licznik);
+            if ((licznik >= 2)) { current.handrank = HandRank.ThreeOfAKind; current.handranknumber = wynik; return; } 
             licznik = 0;
             licznik2 = 0;
             wynik = 0;
@@ -515,8 +519,8 @@ namespace trzy_gry
                 }
 
             }
-
-            if ((licznik == 1) && ( licznik2 >= 1)) { current.handrank = HandRank.TwoPair; current.handranknumber = wynik; return; } 
+            System.Diagnostics.Debug.WriteLine("Two Pair licznik =  " + licznik + " licznik 2 = " + licznik2);
+            if (((licznik == 1) && ( licznik2 >= 1)) || (licznik == 2)  ) { current.handrank = HandRank.TwoPair; current.handranknumber = wynik; return; } 
             licznik = 0;
             licznik2 = 0;
             wynik = 0;
@@ -532,16 +536,16 @@ namespace trzy_gry
                
 
             }
-
+            System.Diagnostics.Debug.WriteLine("One Pair licznik =  " + licznik );
             if ((licznik == 1)) { current.handrank = HandRank.OnePair; current.handranknumber = wynik; return; }
             licznik = 0;
             licznik2 = 0;
             wynik = 0;
 
             // One Pair------------------------------------------------------------
-            current.handrank = HandRank.HighCard; current.handranknumber = temp[0].liczba; return;
+            current.handrank = HandRank.HighCard; current.handranknumber = temp[0].liczba; return; // z ręki ???
 
-            // 3 te same i 2 nie wykrywa 3+2 pot trza naprawic dodawanie do raczej xdD
+            // 3 te same i 2 nie wykrywa 3+2 pot trza naprawic dodawanie do raczej xdD nie wykrywa par 
         }
 
         void whoWon()
@@ -560,8 +564,7 @@ namespace trzy_gry
                     if(players[i].handranknumber > players[winner].handranknumber)
                     {
                         winner = i;
-                    }
-                    if (players[i].handranknumber == players[winner].handranknumber)
+                    } else  if (players[i].handranknumber == players[winner].handranknumber)
                     {
 
                         tie.Add(winner);
@@ -576,7 +579,7 @@ namespace trzy_gry
                 }
                 
             }
-
+            System.Diagnostics.Debug.WriteLine("tie count " + tie.Count);
             if (tie.Count >0)
             {
                 pot.Text = " tie  with";
@@ -588,7 +591,7 @@ namespace trzy_gry
             }
             else
             {
-                players[winner].money = potValue;
+                players[winner].money += potValue;
                 pot.Text = " winner  player" + players[winner].id;
             }
             System.Diagnostics.Debug.WriteLine("winner " + winner);
@@ -612,7 +615,7 @@ namespace trzy_gry
         void decideWinner()
         {
             List<Card> temp = new List<Card> { };
-
+           // System.Diagnostics.Debug.WriteLine("arena count = " + arena.Count);
             for (int i = 0; i < players.Count; i++)
             {
                 if (players[i].folded) continue;
@@ -624,6 +627,7 @@ namespace trzy_gry
                 }
                 for (int j = 0; j < arena.Count; j++)
                 {
+                    //System.Diagnostics.Debug.WriteLine("arena "+j+"count " + arena[j].Count);
                     temp.Add(arena[j][0]);
                 }
                 evalute(temp, players[i]);
@@ -642,8 +646,8 @@ namespace trzy_gry
         void nextturn()
         {
 
-            if (turn == 3) { System.Diagnostics.Debug.WriteLine("turn 3  decide Winner" ); decideWinner(); }
-            if(playersFolded >= 3 ) { System.Diagnostics.Debug.WriteLine("folded > 3  decide Winner"); decideWinner(); }
+            if (turn == 3) { System.Diagnostics.Debug.WriteLine("turn 3  decide Winner" ); decideWinner(); return; }
+            if(playersFolded >= 3 ) { System.Diagnostics.Debug.WriteLine("folded > 3  decide Winner"); decideWinner(); return; }
 
             if (turn == 0)
             {
@@ -693,7 +697,7 @@ namespace trzy_gry
         {
             int folded = 0;
             for (int i = 0; i < players.Count; i++) if (players[i].folded) folded++;
-            if (folded > 3) { System.Diagnostics.Debug.WriteLine("folded fun  decide Winner"); decideWinner(); }
+            if (folded >= 3) { System.Diagnostics.Debug.WriteLine("folded fun  decide Winner"); decideWinner(); }
             current.nameplate.Text = "player"+ current.id+ " money: "+ current.money + " Folded";
             current.folded = true;
             playersFolded++;
@@ -704,7 +708,7 @@ namespace trzy_gry
             potValue += currentRaise;
             pot.Text = "pot: " + potValue;
             players[current.id].setMoney(current.money - currentRaise);
-            System.Diagnostics.Debug.WriteLine("player [" + current.id + "] called money = " + current.money);
+            //System.Diagnostics.Debug.WriteLine("player [" + current.id + "] called money = " + current.money);
             current.nameplate.Text = "player" + current.id + " money: " + current.money + " Called";
 
            
@@ -719,7 +723,7 @@ namespace trzy_gry
 
             players[current.id].setMoney(current.money - currentRaise);
 
-            System.Diagnostics.Debug.WriteLine("player [" + current.id + "] rised money = " + current.money);
+           // System.Diagnostics.Debug.WriteLine("player [" + current.id + "] rised money = " + current.money);
             current.nameplate.Text = "player" + current.id + " money: " + current.money + " Rised for "+ currentRaise;
 
             dotest( current);
@@ -753,6 +757,7 @@ namespace trzy_gry
         private void rise_Click(object sender, EventArgs e)
         {
             messege.Text = "";
+            if (turn == 3) return;
             if (playercanclick) risefun(players[players.Count - 1]);
             playercanclick = false;
         }
@@ -770,7 +775,7 @@ namespace trzy_gry
             {
              //   System.Diagnostics.Debug.WriteLine("player [" + i + "] money = " + players[i].money);
             }
-            System.Diagnostics.Debug.WriteLine("-------------------------" );
+            
             if (!playercanclick)
             {
                 
@@ -793,7 +798,7 @@ namespace trzy_gry
         private void board_new_rozdanie_Click(object sender, EventArgs e)
         {
             if (!factualnextturnclick) return;
-            
+            System.Diagnostics.Debug.WriteLine("-------------------------");
             System.Diagnostics.Debug.WriteLine("nowe rozdanie");
 
             //resetownie rąk
@@ -813,6 +818,8 @@ namespace trzy_gry
             {
                 deck[i].Visible = false;
             }
+
+            arena.Clear(); //:[
 
             Shuffle<Card>(deck);
             Shuffle<Card>(deck);
