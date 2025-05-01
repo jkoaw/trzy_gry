@@ -109,6 +109,7 @@ namespace trzy_gry
             {
                 item.generateCardReverse();
                 item.cardID = j;
+                item.playerID = 999;
                 item.Click += card_Click;
                 this.Controls.Add(item);
                 item.Visible = false;
@@ -231,6 +232,7 @@ namespace trzy_gry
             {
                 for (int i = 0; i < current.hand.Count; i++)
                 {
+                    current.hand[i].playerID = current.id;
                     current.hand[i].generateCard();
                     current.hand[i].locationen( current.playerWidth + (arena[0][0].Width + 10) * i, current.playerHeight);
                     current.hand[i].Visible = true;
@@ -248,6 +250,7 @@ namespace trzy_gry
 
                 for (int i = 0; i < current.hand.Count; i++)
                 {
+                    current.hand[i].playerID = current.id;
                     current.hand[i].generateCardReverse();
                     current.hand[i].locationen(current.playerWidth + (arena[0][0].Width+10)*i, current.playerHeight);
                     current.hand[i].Visible = true;
@@ -377,9 +380,9 @@ namespace trzy_gry
             System.Diagnostics.Debug.WriteLine(" player[" + current.id + "] ------------------------------------------------------------");
          
             System.Diagnostics.Debug.WriteLine("player["+current.id+"] hand + arena " + temp[0].liczba +" "+ temp[1].liczba + " " + temp[2].liczba + " " + temp[3].liczba + " " + temp[4].liczba + " " + temp[5].liczba + " " + temp[6].liczba);
-            
 
-            
+
+            bool haveplayerscard = false;
             //Royal Flush------------------------------------------------------------
             int licznik = 0;
             for (int i = 0; i < temp.Count-1; i++)
@@ -389,7 +392,7 @@ namespace trzy_gry
                     if (temp[i].liczba == temp[i + 1].liczba + 1 && temp[i].znaczek == temp[i + 1].znaczek)
                     {
                         licznik++;
-
+                        if (temp[i].playerID == current.id || temp[i + 1].playerID == current.id) haveplayerscard = true;
                         if (licznik == 4) break;
                     }
                 }
@@ -397,36 +400,43 @@ namespace trzy_gry
              
             }
             System.Diagnostics.Debug.WriteLine("Royal Flush  licznik =  " + licznik);
-            if (licznik >= 4) { current.handrank = HandRank.RoyalFlush; return; }
+            if (licznik >= 4 && haveplayerscard) { current.handrank = HandRank.RoyalFlush; return; }
             licznik = 0;
+            haveplayerscard = false;
             //Straight Flush------------------------------------------------------------
             for (int i = 0; i < temp.Count - 1; i++)
             {              
                 if (temp[i].liczba == temp[i + 1].liczba + 1 && temp[i].znaczek == temp[i + 1].znaczek)
                 {
                     licznik++;
+                    if (temp[i].playerID == current.id || temp[i+1].playerID == current.id) haveplayerscard = true;
                 }
             
 
             }
             System.Diagnostics.Debug.WriteLine("Straight Flush  licznik =  " + licznik);
-            if (licznik >= 4) { current.handrank = HandRank.StraightFlush; current.handranknumber = temp[0].liczba; return; }
+            
+            if (licznik >= 4 && haveplayerscard) { current.handrank = HandRank.StraightFlush; current.handranknumber = temp[0].liczba; return; }
+            haveplayerscard = false;
+            licznik = 0;
             //Four of a Kind------------------------------------------------------------
             for (int i = 0; i < temp.Count - 1; i++)
             {
                 if (temp[i].liczba == temp[i + 1].liczba)
                 {
                     licznik++;
+                    if (temp[i].playerID == current.id || temp[i + 1].playerID == current.id) haveplayerscard = true;
                     if (licznik == 3) break;
                 }
                 else licznik = 0;
                 
             }
             System.Diagnostics.Debug.WriteLine("Four of a Kind  licznik =  " + licznik);
-            if (licznik == 3) { current.handrank = HandRank.FourOfAKind; current.handranknumber = temp[0].liczba; return; }
+            if (licznik == 3 && haveplayerscard) { current.handrank = HandRank.FourOfAKind; current.handranknumber = temp[0].liczba; return; }
             licznik = 0;
             int licznik2 = 0;
             int wynik = 0;
+            haveplayerscard = false;
             //Full House------------------------------------------------------------
             int var = 0;
             for (int i = 0; i < temp.Count - 1; i++)
@@ -436,20 +446,23 @@ namespace trzy_gry
                     var = i;
                     licznik++;
                     wynik += temp[i].liczba;
+                    if (temp[i].playerID == current.id || temp[i + 1].playerID == current.id) haveplayerscard = true;
                 }
                 if (temp[i].liczba == temp[i + 1].liczba && temp[var].liczba != temp[i].liczba)
                 {
                     licznik2++;
                     wynik += temp[i].liczba;
+                    if (temp[i].playerID == current.id || temp[i + 1].playerID == current.id) haveplayerscard = true;
                 }
                
             }
             System.Diagnostics.Debug.WriteLine("Full House licznik =  " + licznik+ " licznik 2 = "+ licznik2);
-            if ((licznik == 2 || licznik >= 1) && (licznik2 == 3 || licznik2 >= 1)) { current.handrank = HandRank.FullHouse; current.handranknumber = wynik; return; } //mabe player extension maybe 1 lub  2 ten wynik uhh
+            if ((licznik == 2 || licznik >= 1) && (licznik2 == 3 || licznik2 >= 1) && haveplayerscard) { current.handrank = HandRank.FullHouse; current.handranknumber = wynik; return; } //mabe player extension maybe 1 lub  2 ten wynik uhh
             licznik = 0;
             var = 0;
             licznik2 = 0;
             wynik = 0;
+            haveplayerscard = false;
             //Flush------------------------------------------------------------
             for (int i = 0; i < temp.Count - 1; i++)
             {
@@ -457,14 +470,16 @@ namespace trzy_gry
                 {
                     licznik++;
                     wynik += temp[i].liczba;
+                    if (temp[i].playerID == current.id || temp[i + 1].playerID == current.id) haveplayerscard = true;
                 }
                
             }
             System.Diagnostics.Debug.WriteLine("Flush licznik =  " + licznik);
-            if ((licznik >= 4 ) ) { current.handrank = HandRank.Flush; current.handranknumber = wynik; return; } 
+            if ((licznik >= 4 ) && haveplayerscard) { current.handrank = HandRank.Flush; current.handranknumber = wynik; return; } 
             licznik = 0;
             licznik2 = 0;
             wynik = 0;
+            haveplayerscard = false;
             //Straight------------------------------------------------------------
             for (int i = 0; i < temp.Count - 1; i++)
             {
@@ -472,20 +487,24 @@ namespace trzy_gry
                 {
                     licznik++;
                     wynik += temp[i].liczba;
+                    if (temp[i].playerID == current.id || temp[i + 1].playerID == current.id) haveplayerscard = true;
                     if (licznik == 4) break;
+                  
                 }
                 else
                 {
                     licznik = 0;
                     wynik = 0;
+                    if (temp[i].playerID == current.id || temp[i + 1].playerID == current.id) haveplayerscard = true;
                 }
 
             }
             System.Diagnostics.Debug.WriteLine("Straight licznik =  " + licznik);
-            if ((licznik >= 4)) { current.handrank = HandRank.Straight; current.handranknumber = wynik; return; } 
+            if ((licznik >= 4) && haveplayerscard) { current.handrank = HandRank.Straight; current.handranknumber = wynik; return; } 
             licznik = 0;
             licznik2 = 0;
             wynik = 0;
+            haveplayerscard = false;
             // Three of a Kind------------------------------------------------------------ bugg zał liczba dwie 6 jako i w dodatku krówl xd
             for (int i = 0; i < temp.Count - 1; i++)
             {
@@ -493,16 +512,18 @@ namespace trzy_gry
                 {
                     licznik++;
                     wynik = temp[i].liczba;
+                    if (temp[i].playerID == current.id || temp[i + 1].playerID == current.id) haveplayerscard = true;
                     if (licznik == 2) break;
                 }
                 else { licznik = 0; wynik = 0; } 
 
             }
             System.Diagnostics.Debug.WriteLine("Three of a Kind licznik =  " + licznik);
-            if ((licznik >= 2)) { current.handrank = HandRank.ThreeOfAKind; current.handranknumber = wynik; return; } 
+            if ((licznik >= 2) && haveplayerscard) { current.handrank = HandRank.ThreeOfAKind; current.handranknumber = wynik; return; } 
             licznik = 0;
             licznik2 = 0;
             wynik = 0;
+            haveplayerscard = false;
             // Two Pair------------------------------------------------------------
             for (int i = 0; i < temp.Count - 1; i++)
             {
@@ -510,20 +531,23 @@ namespace trzy_gry
                 {
                     var = i;
                     licznik++;
+                    if (temp[i].playerID == current.id || temp[i + 1].playerID == current.id) haveplayerscard = true;
                     wynik += temp[i].liczba;
                 }
                 if (temp[i].liczba == temp[i + 1].liczba && temp[var].liczba != temp[i].liczba)
                 {
                     licznik2++;
                     wynik += temp[i].liczba;
+                    if (temp[i].playerID == current.id || temp[i + 1].playerID == current.id) haveplayerscard = true;
                 }
 
             }
             System.Diagnostics.Debug.WriteLine("Two Pair licznik =  " + licznik + " licznik 2 = " + licznik2);
-            if (((licznik == 1) && ( licznik2 >= 1)) || (licznik == 2)  ) { current.handrank = HandRank.TwoPair; current.handranknumber = wynik; return; } 
+            if (((licznik == 1) && ( licznik2 >= 1)) || (licznik == 2) && haveplayerscard) { current.handrank = HandRank.TwoPair; current.handranknumber = wynik; return; } 
             licznik = 0;
             licznik2 = 0;
             wynik = 0;
+            haveplayerscard = false;
             // One Pair------------------------------------------------------------
             for (int i = 0; i < temp.Count - 1; i++)
             {
@@ -532,18 +556,29 @@ namespace trzy_gry
                    
                     licznik++;
                     wynik += temp[i].liczba;
+                    if (temp[i].playerID == current.id || temp[i + 1].playerID == current.id) haveplayerscard = true;
                 }
                
 
             }
             System.Diagnostics.Debug.WriteLine("One Pair licznik =  " + licznik );
-            if ((licznik == 1)) { current.handrank = HandRank.OnePair; current.handranknumber = wynik; return; }
+            if ((licznik == 1) && haveplayerscard) { current.handrank = HandRank.OnePair; current.handranknumber = wynik; return; }
             licznik = 0;
             licznik2 = 0;
             wynik = 0;
-
+            haveplayerscard = false;
             // One Pair------------------------------------------------------------
-            current.handrank = HandRank.HighCard; current.handranknumber = temp[0].liczba; return; // z ręki ???
+            current.handrank = HandRank.HighCard;
+            foreach (Card item in temp)
+            {
+                if (item.playerID == current.id)
+                {
+                    current.handranknumber = temp[0].liczba;
+                    break;
+                }
+
+            }
+            return; // z ręki ???
 
             // 3 te same i 2 nie wykrywa 3+2 pot trza naprawic dodawanie do raczej xdD nie wykrywa par 
         }
@@ -805,7 +840,10 @@ namespace trzy_gry
 
             for (int i = 0; i < players.Count ; i++)
             {
-
+                for (int j = 0; j < players[i].hand.Count; j++)
+                {
+                    players[i].hand[j].playerID = 999;
+                }
                 players[i].hand.Clear();
             }
             for (int i = 0; i < arena.Count; i++)
