@@ -19,5 +19,11 @@ namespace trzy_gry
             Form3 xdd = new Form3(this);
             xdd.Show();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Form4 cos = new Form4(this);
+            cos.Show();
+        }
     }
 }

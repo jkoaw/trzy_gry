@@ -55,9 +55,13 @@ namespace trzy_gry
         public Card()
         {
             this.Size = new Size(cardwidth, cardheight - 60);
-            generateCard2();
-            grafika = Graphics.FromImage(this.Image);
-            ControlPaint.DrawBorder(grafika, this.ClientRectangle, Color.Black, ButtonBorderStyle.Solid);
+            if (this.liczba > 1)
+            {
+                generateCard2();
+                grafika = Graphics.FromImage(this.Image);
+                ControlPaint.DrawBorder(grafika, this.ClientRectangle, Color.Black, ButtonBorderStyle.Solid);
+
+            }
             this.Tag = Color.Red;
             //this.Click += image_Click;
            // this.AllowDrop = true;
