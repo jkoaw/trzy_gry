@@ -284,14 +284,14 @@ namespace trzy_gry
                                 pomoc = pomoc.wsk;
 
                             }
+                            //for (int i = 0; i < licznik; i++)
+                            //{
+                                co_na_kolumnach[doprzs.column].Remove(co_na_kolumnach[doprzs.column][co_na_kolumnach[doprzs.column].Count - 1]);
+                            //}
                             if (co_na_kolumnach[doprzs.column][co_na_kolumnach[doprzs.column].Count - 1].status == 0)
                             {
                                 co_na_kolumnach[doprzs.column][co_na_kolumnach[doprzs.column].Count - 1].status = 1;
                                 co_na_kolumnach[doprzs.column][co_na_kolumnach[doprzs.column].Count - 1].Image = co_na_kolumnach[doprzs.column][co_na_kolumnach[doprzs.column].Count - 1].twarz;
-                            }
-                            for (int i = 0; i < licznik; i++)
-                            {
-                                co_na_kolumnach[doprzs.column].Remove(co_na_kolumnach[doprzs.column][co_na_kolumnach[doprzs.column].Count - 1]);
                             }
                             co_na_kolumnach[doprzs.column][co_na_kolumnach[doprzs.column].Count - 1].wsk = null;
                             doprzs.column = kolumna_docelowa;
@@ -317,6 +317,13 @@ namespace trzy_gry
                 }
             }
             if (cos.wsk == null) return true;
+            if (cos.liczba == 2 && cos.wsk.liczba == 14)
+            {
+                if(cos.wsk.wsk == null)
+                {
+                    return true;
+                }
+            }
             if (cos.znaczek == cos.wsk.znaczek && cos.liczba == cos.wsk.Liczba + 1)
             {
                 if (cos.wsk == null)
